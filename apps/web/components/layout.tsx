@@ -227,10 +227,6 @@ function RenameDialog() {
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
-                <p>
-                  The deadline to transfer your data is November 15, 2024. If you don&apos;t
-                  transition to {currentDomainHostname} by then, you will lose your data.
-                </p>
 
                 <p className="prose">
                   To transfer your databases:
