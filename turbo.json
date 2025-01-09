@@ -4,6 +4,7 @@
   "tasks": {
     "@database.build/deploy#build": {
       "dependsOn": ["^build"],
+      "env": [],
       "outputs": ["dist/**"],
       "cache": true
     },
@@ -15,6 +16,7 @@
     },
     "@database.build/deploy-worker#build": {
       "dependsOn": ["^build"],
+      "env": ["SUPABASE_*"],
       "cache": false
     },
     "@database.build/browser-proxy#dev": {
