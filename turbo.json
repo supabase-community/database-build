@@ -31,6 +31,14 @@
     },
     "@database.build/web#build": {
       "dependsOn": ["^build"],
+      "env": [
+        "NEXT_PUBLIC_*",
+        "OPENAI_*",
+        "KV_*",
+        "SUPABASE_*",
+        "LOGFLARE_*",
+        "REDIRECT_LEGACY_DOMAIN"
+      ],
       "outputs": [".next/**", "!.next/cache/**"],
       "cache": true
     },
