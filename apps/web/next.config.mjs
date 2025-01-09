@@ -45,6 +45,10 @@ const nextConfig = {
       process.env.NEXT_PUBLIC_LEGACY_DOMAIN &&
       process.env.NEXT_PUBLIC_CURRENT_DOMAIN
     ) {
+      console.info(
+        `Redirecting ${process.env.NEXT_PUBLIC_LEGACY_DOMAIN} to ${process.env.NEXT_PUBLIC_CURRENT_DOMAIN} (except ${process.env.NEXT_PUBLIC_LEGACY_DOMAIN}/export)`
+      )
+
       const legacyHostname = new URL(process.env.NEXT_PUBLIC_LEGACY_DOMAIN).hostname
 
       redirects.push({
