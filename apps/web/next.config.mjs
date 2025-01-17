@@ -60,7 +60,7 @@ const nextConfig = {
           },
         ],
         destination: `${process.env.NEXT_PUBLIC_CURRENT_DOMAIN}/:path?from=${legacyHostname}`,
-        permanent: false,
+        permanent: true,
       })
     }
 
