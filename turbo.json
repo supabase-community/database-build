@@ -39,12 +39,7 @@
         "KV_*",
         "SUPABASE_*",
         "LOGFLARE_*",
-        "REDIRECT_LEGACY_DOMAIN",
-        "AWS_ACCESS_KEY_ID",
-        "AWS_SECRET_ACCESS_KEY",
-        "FORCE_ASSET_CDN",
-        "ASSET_CDN_S3_ENDPOINT",
-        "SITE_NAME"
+        "REDIRECT_LEGACY_DOMAIN"
       ],
       "outputs": [".next/**", "!.next/cache/**"],
       "cache": true
