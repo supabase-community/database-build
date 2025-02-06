@@ -1,6 +1,5 @@
 import { FeatureExtractionPipelineOptions } from '@xenova/transformers'
 import * as Comlink from 'comlink'
-import { getWorkerURL } from '../utils'
 
 type EmbedFn = (typeof import('./worker.ts'))['embed']
 
@@ -16,9 +15,7 @@ function getEmbedFn() {
     throw new Error('Embed function only available in the browser')
   }
 
-  const worker = new Worker(getWorkerURL(new URL('./worker.js', import.meta.url)), {
-    type: 'module',
-  })
+  const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' })
   embedFn = Comlink.wrap<EmbedFn>(worker)
   return embedFn
 }
