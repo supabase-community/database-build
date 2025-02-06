@@ -67,6 +67,19 @@ const nextConfig = {
 
     return redirects
   },
+  headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "worker-src 'self' https://frontend-assets.supabase.com",
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig
