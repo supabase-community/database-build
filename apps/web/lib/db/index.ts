@@ -57,7 +57,7 @@ export class DbManager {
       // Note the below syntax is required by webpack in order to
       // identify the worker properly during static analysis
       // see: https://webpack.js.org/guides/web-workers/
-      new Worker(getWorkerURL(new URL('./worker.ts', import.meta.url)), { type: 'module' }),
+      new Worker(getWorkerURL(new URL('./worker.js', import.meta.url)), { type: 'module' }),
       {
         // Opt out of PGlite worker leader election / shared DBs
         id: options?.id ?? nanoid(),
