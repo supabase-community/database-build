@@ -7,6 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getWorkerURL(url: URL | string) {
   return URL.createObjectURL(
-    new Blob([`importScripts("${url.toString()}");`], { type: 'text/javascript' })
+    new Blob(
+      [
+        /* JS */ `import * as workerModule from "${url.toString()}";Object.assign(self, workerModule);`,
+      ],
+      { type: 'text/javascript' }
+    )
   )
 }
