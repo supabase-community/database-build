@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { getDatabasesQueryKey } from '~/data/databases/databases-query'
 import { DbManager } from '~/lib/db'
 import { hasFile, saveFile } from '~/lib/files'
+import { useOrigin } from '~/lib/hooks'
 import { tarStreamEntryToFile, waitForChunk } from '~/lib/streams'
 import { requestFileUpload, stripSuffix } from '~/lib/util'
 
@@ -22,6 +23,7 @@ export default function Page() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [progress, setProgress] = useState<number>()
+  const origin = useOrigin()
 
   return (
     <>
@@ -45,7 +47,7 @@ export default function Page() {
             <h4 className="mb-4">How to export and import your databases</h4>
             <ol>
               <li>
-                Navigate to <Link href={'/export'}>{window.location.origin}/export</Link> and click{' '}
+                Navigate to <Link href="/export">{origin ?? ''}/export</Link> and click{' '}
                 <strong>Export</strong> to download all of your databases into a single tarball.
               </li>
               <li>

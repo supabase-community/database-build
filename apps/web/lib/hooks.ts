@@ -611,3 +611,17 @@ export function useQueryEvent(event: string, callback: (params: URLSearchParams)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, params])
 }
+
+/**
+ * Get the origin of the current window in a
+ * SSR/hydration safe way.
+ */
+export function useOrigin() {
+  const [origin, setOrigin] = useState<string>()
+
+  useEffect(() => {
+    setOrigin(window.location.origin)
+  }, [])
+
+  return origin
+}

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/u
 import { Progress } from '~/components/ui/progress'
 import { DbManager } from '~/lib/db'
 import { countFiles, listFiles } from '~/lib/files'
+import { useOrigin } from '~/lib/hooks'
 import {
   fileFromStream,
   fileToTarStreamFile,
@@ -22,6 +23,7 @@ import { downloadFile } from '~/lib/util'
 export default function Page() {
   const { dbManager } = useApp()
   const [progress, setProgress] = useState<number>()
+  const origin = useOrigin()
 
   return (
     <>
@@ -104,7 +106,7 @@ export default function Page() {
                 along with any files that you imported or exported in your chats.
               </li>
               <li>
-                Navigate to <Link href="/import">{window.location.origin}/import</Link> and click{' '}
+                Navigate to <Link href="/import">{origin ?? ''}/import</Link> and click{' '}
                 <strong>Import</strong>.
               </li>
             </ol>
