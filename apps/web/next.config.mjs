@@ -35,37 +35,6 @@ const nextConfig = {
     return config
   },
   swcMinify: false,
-  async redirects() {
-    /** @type {import('next/dist/lib/load-custom-routes').Redirect[]} */
-    const redirects = []
-
-    // All postgres.new/* redirect to database.build/*, except postgres.new/export
-    if (
-      process.env.REDIRECT_LEGACY_DOMAIN === 'true' &&
-      process.env.NEXT_PUBLIC_LEGACY_DOMAIN &&
-      process.env.NEXT_PUBLIC_CURRENT_DOMAIN
-    ) {
-      console.info(
-        `Redirecting ${process.env.NEXT_PUBLIC_LEGACY_DOMAIN} to ${process.env.NEXT_PUBLIC_CURRENT_DOMAIN} (except ${process.env.NEXT_PUBLIC_LEGACY_DOMAIN}/export)`
-      )
-
-      const legacyHostname = new URL(process.env.NEXT_PUBLIC_LEGACY_DOMAIN).hostname
-
-      redirects.push({
-        source: '/:path((?!export$).*)',
-        has: [
-          {
-            type: 'host',
-            value: legacyHostname,
-          },
-        ],
-        destination: `${process.env.NEXT_PUBLIC_CURRENT_DOMAIN}/:path?from=${legacyHostname}`,
-        permanent: true,
-      })
-    }
-
-    return redirects
-  },
 }
 
 export default nextConfig
