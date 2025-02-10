@@ -5,12 +5,6 @@ import { chunk } from 'lodash'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useApp } from '~/components/app-provider'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '~/components/ui/accordion'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog'
 import { Progress } from '~/components/ui/progress'
@@ -23,12 +17,7 @@ import {
   readableStreamFromIterable,
   transformStreamFromFn,
 } from '~/lib/streams'
-import {
-  currentDomainHostname,
-  currentDomainUrl,
-  downloadFile,
-  legacyDomainHostname,
-} from '~/lib/util'
+import { downloadFile } from '~/lib/util'
 
 export default function Page() {
   const { dbManager } = useApp()
@@ -42,61 +31,15 @@ export default function Page() {
             <DialogTitle>Export your databases</DialogTitle>
             <div className="py-2 border-b" />
           </DialogHeader>
+          <p>All databases live locally within your browser&apos;s local IndexedDB storage.</p>
           <p>
-            {legacyDomainHostname} is renaming to {currentDomainHostname}, which means you need to
-            transfer your databases if you wish to continue using them.
+            You can backup and restore your databases in order to transfer them between browsers or
+            devices.
           </p>
 
-          <Accordion type="single" collapsible>
-            <AccordionItem value="item-1" className="border rounded-md">
-              <AccordionTrigger className="p-0 gap-2 px-3 py-2">
-                <div className="flex gap-2 items-center font-normal text-lighter text-sm">
-                  <span>
-                    Why is {legacyDomainHostname} renaming to {currentDomainHostname}?
-                  </span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-3 prose prose-sm">
-                This project is not an official Postgres project and we don&apos;t want to mislead
-                anyone! We&apos;re renaming to{' '}
-                <Link href={currentDomainUrl} className="underline">
-                  {currentDomainHostname}
-                </Link>{' '}
-                because, well, that&apos;s what this does. This will still be 100% Postgres-focused,
-                just with a different URL.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-          <Accordion type="single" collapsible>
-            <AccordionItem value="item-1" className="border rounded-md">
-              <AccordionTrigger className="p-0 gap-2 px-3 py-2">
-                <div className="flex gap-2 items-center font-normal text-lighter text-sm">
-                  <span>Why do I need to export my databases?</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-3 prose prose-sm">
-                <p>
-                  Since PGlite databases are stored in your browser&apos;s IndexedDB storage, other
-                  domains like{' '}
-                  <Link href={currentDomainUrl} className="underline">
-                    {currentDomainHostname}
-                  </Link>{' '}
-                  cannot access them directly (this is a security restriction built into every
-                  browser).
-                </p>
-                <p>
-                  If you&apos;d like to continue using your previous databases and conversations:
-                  <ol>
-                    <li>Export them from {legacyDomainHostname}</li>
-                    <li>Import them to {currentDomainHostname}</li>
-                  </ol>
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
           <div className="my-2 border-b" />
           <div className="prose">
-            <h4 className="mb-4">How to transfer your databases to {currentDomainHostname}</h4>
+            <h4 className="mb-4">How to export and import your databases</h4>
             <ol>
               <li>
                 Click <strong>Export</strong> to download all of your databases into a single
@@ -158,12 +101,11 @@ export default function Page() {
                 )}
                 <br />
                 This tarball will contain every PGlite database&apos;s <code>pgdata</code> dump
-                along with any files you imported or exported from {legacyDomainHostname}.
+                along with any files that you imported or exported in your chats.
               </li>
               <li>
-                Navigate to{' '}
-                <Link href={`${currentDomainUrl}/import`}>{currentDomainHostname}/import</Link> and
-                click <strong>Import</strong>.
+                Navigate to <Link href="/import">{window.location.origin}/import</Link> and click{' '}
+                <strong>Import</strong>.
               </li>
             </ol>
           </div>

@@ -29,7 +29,6 @@ import {
   parseReadyForQuery,
   parseStartupMessage,
 } from '~/lib/pg-wire-util'
-import { legacyDomainHostname } from '~/lib/util'
 import { parse, serialize } from '~/lib/websocket-protocol'
 import { createClient } from '~/utils/supabase/client'
 import { useModelProvider } from './model-provider/use-model-provider'
@@ -43,7 +42,6 @@ export default function AppProvider({ children }: AppProps) {
   const [isLoadingUser, setIsLoadingUser] = useState(true)
   const [user, setUser] = useState<User>()
   const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(false)
-  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isRateLimited, setIsRateLimited] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
 
@@ -259,22 +257,9 @@ export default function AppProvider({ children }: AppProps) {
     clientIp: connectedClientIp,
     isLiveSharing: Boolean(liveSharedDatabaseId),
   }
-  const [isLegacyDomain, setIsLegacyDomain] = useState(false)
-  const [isLegacyDomainRedirect, setIsLegacyDomainRedirect] = useState(false)
 
   const [modelProviderError, setModelProviderError] = useState<string>()
   const [isModelProviderDialogOpen, setIsModelProviderDialogOpen] = useState(false)
-
-  useEffect(() => {
-    const isLegacyDomain = window.location.hostname === legacyDomainHostname
-    const urlParams = new URLSearchParams(window.location.search)
-    const isLegacyDomainRedirect = urlParams.get('from') === legacyDomainHostname
-
-    // Set via useEffect() to prevent SSR hydration issues
-    setIsLegacyDomain(isLegacyDomain)
-    setIsLegacyDomainRedirect(isLegacyDomainRedirect)
-    setIsRenameDialogOpen(isLegacyDomain || isLegacyDomainRedirect)
-  }, [])
 
   const modelProvider = useModelProvider()
 
@@ -291,8 +276,6 @@ export default function AppProvider({ children }: AppProps) {
         signOut,
         isSignInDialogOpen,
         setIsSignInDialogOpen,
-        isRenameDialogOpen,
-        setIsRenameDialogOpen,
         isRateLimited,
         setIsRateLimited,
         isModelProviderDialogOpen,
@@ -301,8 +284,6 @@ export default function AppProvider({ children }: AppProps) {
         dbManager,
         pgliteVersion,
         pgVersion,
-        isLegacyDomain,
-        isLegacyDomainRedirect,
         showSidebar,
         setShowSidebar,
       }}
@@ -323,8 +304,6 @@ export type AppContextValues = {
   signOut: () => Promise<void>
   isSignInDialogOpen: boolean
   setIsSignInDialogOpen: (open: boolean) => void
-  isRenameDialogOpen: boolean
-  setIsRenameDialogOpen: (open: boolean) => void
   isRateLimited: boolean
   setIsRateLimited: (limited: boolean) => void
   isModelProviderDialogOpen: boolean
@@ -343,8 +322,6 @@ export type AppContextValues = {
   modelProvider: ReturnType<typeof useModelProvider>
   modelProviderError?: string
   setModelProviderError: (error: string | undefined) => void
-  isLegacyDomain: boolean
-  isLegacyDomainRedirect: boolean
   showSidebar: boolean
   setShowSidebar: (show: boolean) => void
 }

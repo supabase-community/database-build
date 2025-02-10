@@ -3,12 +3,6 @@
 import { UntarStream } from '@std/tar/untar-stream'
 import { useState } from 'react'
 import { useApp } from '~/components/app-provider'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '~/components/ui/accordion'
 import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog'
 import { Progress } from '~/components/ui/progress'
@@ -21,14 +15,7 @@ import { getDatabasesQueryKey } from '~/data/databases/databases-query'
 import { DbManager } from '~/lib/db'
 import { hasFile, saveFile } from '~/lib/files'
 import { tarStreamEntryToFile, waitForChunk } from '~/lib/streams'
-import {
-  currentDomainHostname,
-  currentDomainUrl,
-  legacyDomainHostname,
-  legacyDomainUrl,
-  requestFileUpload,
-  stripSuffix,
-} from '~/lib/util'
+import { requestFileUpload, stripSuffix } from '~/lib/util'
 
 export default function Page() {
   const { dbManager } = useApp()
@@ -47,66 +34,19 @@ export default function Page() {
             <DialogTitle>Import your databases</DialogTitle>
             <div className="py-2 border-b" />
           </DialogHeader>
+          <p>All databases live locally within your browser&apos;s local IndexedDB storage.</p>
           <p>
-            {legacyDomainHostname} is renaming to {currentDomainHostname}, which means you need to
-            transfer your databases if you wish to continue using them.
+            You can backup and restore your databases in order to transfer them between browsers or
+            devices.
           </p>
 
-          <Accordion type="single" collapsible>
-            <AccordionItem value="item-1" className="border rounded-md">
-              <AccordionTrigger className="p-0 gap-2 px-3 py-2">
-                <div className="flex gap-2 items-center font-normal text-lighter text-sm">
-                  <span>
-                    Why is {legacyDomainHostname} renaming to {currentDomainHostname}?
-                  </span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-3 prose prose-sm">
-                This project is not an official Postgres project and we don&apos;t want to mislead
-                anyone! We&apos;re renaming to{' '}
-                <Link href={currentDomainUrl} className="underline">
-                  {currentDomainHostname}
-                </Link>{' '}
-                because, well, that&apos;s what this does. This will still be 100% Postgres-focused,
-                just with a different URL.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-          <Accordion type="single" collapsible>
-            <AccordionItem value="item-1" className="border rounded-md">
-              <AccordionTrigger className="p-0 gap-2 px-3 py-2">
-                <div className="flex gap-2 items-center font-normal text-lighter text-sm">
-                  <span>Why do I need to import my databases?</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-3 prose prose-sm">
-                <p>
-                  Since PGlite databases are stored in your browser&apos;s IndexedDB storage,{' '}
-                  <Link href={currentDomainUrl} className="underline">
-                    {currentDomainHostname}
-                  </Link>{' '}
-                  cannot access them directly (this is a security restriction built into every
-                  browser).
-                </p>
-                <p>
-                  If you&apos;d like to continue using your previous databases and conversations:
-                  <ol>
-                    <li>Export them from {legacyDomainHostname}</li>
-                    <li>Import them to {currentDomainHostname}</li>
-                  </ol>
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
           <div className="my-2 border-b" />
           <div className="prose">
-            <h4 className="mb-4">How to transfer your databases to {currentDomainHostname}</h4>
+            <h4 className="mb-4">How to export and import your databases</h4>
             <ol>
               <li>
-                Navigate to{' '}
-                <Link href={`${legacyDomainUrl}/export`}>{legacyDomainHostname}/export</Link> and
-                click <strong>Export</strong> to download all of your databases into a single
-                tarball.
+                Navigate to <Link href={'/export'}>{window.location.origin}/export</Link> and click{' '}
+                <strong>Export</strong> to download all of your databases into a single tarball.
               </li>
               <li>
                 Click <strong>Import</strong> and select the previously exported tarball.
