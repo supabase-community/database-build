@@ -34,20 +34,20 @@ From the monorepo root:
 1. Install dependencies
 
    ```shell
-   npm i
+   pnpm install
    ```
 
 2. Start local Supabase stack:
    ```shell
-   npx supabase start
+   pnpm dlx supabase start
    ```
 3. Store local Supabase URL/anon key in `./apps/web/.env.local`:
-   ```shell
-   npx supabase status -o env \
-     --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
-     --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY |
-       grep NEXT_PUBLIC >> ./apps/web/.env.local
-   ```
+    ```shell
+    pnpm dlx supabase status -o env \
+       --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+       --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY |
+          grep NEXT_PUBLIC >> ./apps/web/.env.local
+    ```
 4. Create an [OpenAI API key](https://platform.openai.com/api-keys) and save to `./apps/web/.env.local`:
    ```shell
    echo 'OPENAI_API_KEY="<openai-api-key>"' >> ./apps/web/.env.local
@@ -76,7 +76,7 @@ From the monorepo root:
 From the monorepo root:
 
 ```shell
-npm run dev
+pnpm dev
 ```
 
 _**Important:** This command uses `turbo` under the hood which understands the relationship between dependencies in the monorepo and automatically builds them accordingly (ie. `./packages/*`). If you by-pass `turbo`, you will have to manually build each `./packages/*` before each `./app/*` can use them._

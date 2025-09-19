@@ -2,10 +2,44 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '~/utils/supabase/admin'
 import { createClient } from '~/utils/supabase/server'
 
-type Credentials = {
+// Represents the stored credentials secret shape
+interface Credentials {
   refreshToken: string
   accessToken: string
   expiresAt: string
+}
+
+// Tokens returned from the Supabase OAuth token endpoint
+interface SupabaseOAuthTokens {
+  access_token: string
+  refresh_token: string
+  expires_in: number // seconds until expiry
+  token_type: 'Bearer'
+}
+
+// Organization object returned from platform API
+interface SupabaseOrganization {
+  id: string
+  name: string
+}
+
+// State passed through the OAuth flow (extend as needed)
+interface OAuthState {
+  databaseId: string
+  [key: string]: unknown
+}
+
+// Minimal shapes for Supabase table rows we touch (until generated types are wired in)
+interface DeploymentProvider {
+  id: string
+}
+
+interface DeploymentProviderIntegration {
+  id: string
+  scope: { organizationId: string }
+  credentials: string
+  revoked_at: string | null
+  deployment_provider_id: string
 }
 
 /**
@@ -36,7 +70,7 @@ export async function GET(req: NextRequest) {
     return new Response('No state provided', { status: 400 })
   }
 
-  const state = JSON.parse(stateParam)
+  const state: OAuthState = JSON.parse(stateParam)
 
   if (!state.databaseId) {
     return new Response('No database id provided', { status: 400 })
@@ -66,13 +100,7 @@ export async function GET(req: NextRequest) {
     return new Response('Failed to get tokens', { status: 500 })
   }
 
-  const tokens = (await tokensResponse.json()) as {
-    access_token: string
-    refresh_token: string
-    // usually 86400 seconds = 1 day
-    expires_in: number
-    token_type: 'Bearer'
-  }
+  const tokens: SupabaseOAuthTokens = await tokensResponse.json()
 
   const organizationsResponse = await fetch(
     `${process.env.NEXT_PUBLIC_SUPABASE_PLATFORM_API_URL}/v1/organizations`,
@@ -89,10 +117,7 @@ export async function GET(req: NextRequest) {
     return new Response('Failed to get organizations', { status: 500 })
   }
 
-  const [organization] = (await organizationsResponse.json()) as {
-    id: string
-    name: string
-  }[]
+  const [organization]: SupabaseOrganization[] = await organizationsResponse.json()
 
   if (!organization) {
     return new Response('Organization not found', { status: 404 })
@@ -111,18 +136,21 @@ export async function GET(req: NextRequest) {
 
   // check if an existing revoked integration exists with the same organization id
   const getRevokedIntegrationsResponse = await supabase
-    .from('deployment_provider_integrations')
+    .from('deployment_provider_integrations' as any)
     .select('id,scope')
-    .eq('deployment_provider_id', getDeploymentProviderResponse.data.id)
+    .eq('deployment_provider_id', (getDeploymentProviderResponse.data as DeploymentProvider).id)
     .not('revoked_at', 'is', null)
 
   if (getRevokedIntegrationsResponse.error) {
     return new Response('Failed to get revoked integrations', { status: 500 })
   }
 
-  const revokedIntegration = getRevokedIntegrationsResponse.data.find(
-    (ri) => (ri.scope as { organizationId: string }).organizationId === organization.id
-  )
+  const revokedIntegrations = (getRevokedIntegrationsResponse.data || []) as {
+    id: string
+    scope: { organizationId: string }
+  }[]
+
+  const revokedIntegration = revokedIntegrations.find((ri) => ri.scope.organizationId === organization.id)
 
   const adminClient = createAdminClient()
 
@@ -145,22 +173,22 @@ export async function GET(req: NextRequest) {
 
   // if an existing revoked integration exists, update the tokens and cancel the revocation
   if (revokedIntegration) {
-    const updateIntegrationResponse = await supabase
+    const updateIntegrationResponse = await (supabase as any)
       .from('deployment_provider_integrations')
       .update({
         credentials: credentialsSecret.data,
         revoked_at: null,
       })
-      .eq('id', revokedIntegration.id)
+      .eq('id', revokedIntegration.id as string)
 
     if (updateIntegrationResponse.error) {
       return new Response('Failed to update integration', { status: 500 })
     }
   } else {
-    const createIntegrationResponse = await supabase
+    const createIntegrationResponse = await (supabase as any)
       .from('deployment_provider_integrations')
       .insert({
-        deployment_provider_id: getDeploymentProviderResponse.data.id,
+        deployment_provider_id: (getDeploymentProviderResponse.data as DeploymentProvider).id,
         credentials: credentialsSecret.data,
         scope: {
           organizationId: organization.id,

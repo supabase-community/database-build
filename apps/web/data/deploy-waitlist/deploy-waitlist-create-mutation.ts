@@ -13,17 +13,20 @@ export const useDeployWaitlistCreateMutation = ({
     mutationFn: async () => {
       const supabase = createClient()
 
-      const { error } = await supabase.from('deploy_waitlist').insert({})
+      // Provide a minimal row shape to satisfy generic; an empty object is valid due to defaults
+      const { error } = await (supabase as any)
+        .from('deploy_waitlist')
+        .insert({} as { user_id?: string })
 
       if (error) {
         throw error
       }
     },
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutation) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: getIsOnDeployWaitlistQueryKey() }),
       ])
-      return onSuccess?.(data, variables, context)
+      return onSuccess?.(data, variables, context as any, mutation as any)
     },
     ...options,
   })

@@ -1,25 +1,27 @@
 FROM node:22-alpine AS base
 
+# Enable corepack and prepare pnpm
+RUN corepack enable
+
 FROM base AS builder
 
 WORKDIR /app
 
-RUN npm install -g turbo@^2
 COPY . .
 
-# Generate a partial monorepo with a pruned lockfile for a target workspace.
-RUN turbo prune @database.build/deploy-worker --docker
+# Generate a partial monorepo with a pruned lockfile for a target workspace using turbo via pnpm dlx
+RUN pnpm dlx turbo prune @database.build/deploy-worker --docker
 
 FROM base AS installer
 WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-RUN npm install
+RUN pnpm install --frozen-lockfile || pnpm install
 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN npx turbo run build --filter=@database.build/deploy-worker
+RUN pnpm dlx turbo run build --filter=@database.build/deploy-worker
 
 FROM base AS runner
 

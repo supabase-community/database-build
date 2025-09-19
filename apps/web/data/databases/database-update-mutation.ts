@@ -25,12 +25,12 @@ export const useDatabaseUpdateMutation = ({
       }
       return await dbManager.updateDatabase(id, { name, isHidden })
     },
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutation) {
       await Promise.all([queryClient.invalidateQueries({ queryKey: getDatabasesQueryKey() })])
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: getDatabaseQueryKey(variables.id) }),
       ])
-      return onSuccess?.(data, variables, context)
+      return onSuccess?.(data, variables, context as any, mutation as any)
     },
     ...options,
   })
