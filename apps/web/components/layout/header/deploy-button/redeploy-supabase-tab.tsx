@@ -8,25 +8,17 @@ import { DeployedDatabase } from '~/data/deployed-databases/deployed-databases-q
 import { useIntegrationQuery } from '~/data/integrations/integration-query'
 import type { MergedDatabase } from '~/data/merged-databases/merged-database'
 import { getDeployUrl } from '~/lib/util'
+import type { SupabaseProviderMetadata } from '@database.build/deploy/supabase'
 
-type SupabaseProject = {
-  id: string
-  name: string
-  pooler: {
-    host: string
-    name: string
-    port: number
-    user: string
-  }
-  region: string
-  database: {
-    host: string
-    name: string
-    port: number
-    user: string
-  }
-  createdAt: string
-  organizationId: string
+function isSupabaseProviderMetadata(v: unknown): v is SupabaseProviderMetadata {
+  return (
+    !!v &&
+    typeof v === 'object' &&
+    'project' in (v as any) &&
+    typeof (v as any).project === 'object' &&
+    (v as any).project !== null &&
+    'id' in (v as any).project
+  )
 }
 
 export function RedeploySupabaseTab(props: {
@@ -36,7 +28,16 @@ export function RedeploySupabaseTab(props: {
   const router = useRouter()
   const { data: integration, isLoading: isLoadingIntegration } = useIntegrationQuery('Supabase')
 
-  const { project } = props.deployment.provider_metadata as { project: SupabaseProject }
+  const metadata = props.deployment.provider_metadata
+  if (!isSupabaseProviderMetadata(metadata)) {
+    return (
+      <TabsContent value="supabase" className="pt-4 mt-4 border-t">
+        <p className="text-sm text-muted-foreground">Supabase deployment metadata unavailable.</p>
+      </TabsContent>
+    )
+  }
+
+  const { project } = metadata
 
   const projectUrl = `${process.env.NEXT_PUBLIC_SUPABASE_PLATFORM_URL}/dashboard/project/${project.id}`
   const databaseUrl = getDatabaseUrl({ project })

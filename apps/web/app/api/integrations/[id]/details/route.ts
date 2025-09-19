@@ -31,13 +31,13 @@ const supabasePlatformConfig: SupabasePlatformConfig = {
  * management API. Details include the organization ID and name
  * that the integration is scoped to.
  */
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = createClient()
   const supabaseAdmin = createAdminClient()
 
   const ctx = {
-    supabase,
+    supabase: supabaseAdmin,
     supabaseAdmin,
     supabasePlatformConfig,
   }
@@ -45,7 +45,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const integrationId = parseInt(id, 10)
 
   try {
-    const { data: integration, error: getIntegrationError } = await supabase
+    const { data: integration, error: getIntegrationError } = await supabaseAdmin
       .from('deployment_provider_integrations')
       .select('*, provider:deployment_providers!inner(id, name)')
       .eq('id', integrationId)

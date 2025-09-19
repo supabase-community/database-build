@@ -1,9 +1,16 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { createClient } from '~/utils/supabase/client'
+import type { Tables } from '~/utils/supabase/db-types'
 
-export type DeployedDatabase = Awaited<ReturnType<typeof getDeployedDatabases>>[number]
+// Row shape from the view combined with joined provider info columns we select
+// We keep it loose (any) for the spread join portion until a generated type exists.
+export type DeployedDatabase = Tables<'latest_deployed_databases'> & {
+  provider_metadata: unknown
+  provider_name?: string
+  last_deployment_at: string | null
+}
 
-async function getDeployedDatabases() {
+async function getDeployedDatabases(): Promise<DeployedDatabase[]> {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('latest_deployed_databases')
@@ -15,7 +22,7 @@ async function getDeployedDatabases() {
     throw error
   }
 
-  return data
+  return (data as unknown as DeployedDatabase[])
 }
 
 export const useDeployedDatabasesQuery = (

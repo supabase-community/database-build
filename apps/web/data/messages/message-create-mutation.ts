@@ -25,11 +25,11 @@ export const useMessageCreateMutation = (
       }
       return await dbManager.createMessage(databaseId, message)
     },
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutation) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: getMessagesQueryKey(databaseId) }),
       ])
-      return onSuccess?.(data, variables, context)
+      return onSuccess?.(data, variables, context as any, mutation as any)
     },
     ...options,
   })

@@ -12,25 +12,18 @@ import { DeployedDatabase } from '~/data/deployed-databases/deployed-databases-q
 import { SupabaseIcon } from '../supabase-icon'
 import { Button } from '../ui/button'
 import { SupabaseDeployInfo, SupabaseDeploymentInfo } from './deploy-info'
+import type { SupabaseProviderMetadata } from '@database.build/deploy/supabase'
 
-type SupabaseProject = {
-  id: string
-  name: string
-  pooler: {
-    host: string
-    name: string
-    port: number
-    user: string
-  }
-  region: string
-  database: {
-    host: string
-    name: string
-    port: number
-    user: string
-  }
-  createdAt: string
-  organizationId: string
+// Narrowing helpers
+function isSupabaseProviderMetadata(v: unknown): v is SupabaseProviderMetadata {
+  return (
+    !!v &&
+    typeof v === 'object' &&
+    'project' in (v as any) &&
+    typeof (v as any).project === 'object' &&
+    (v as any).project !== null &&
+    'id' in (v as any).project
+  )
 }
 
 export type DeployInfoDialogProps = {
@@ -46,7 +39,28 @@ export function DeployInfoDialog({
   onOpenChange,
   onRedeploy,
 }: DeployInfoDialogProps) {
-  const { project } = deployedDatabase.provider_metadata as { project: SupabaseProject }
+  const metadata = deployedDatabase.provider_metadata
+
+  if (!isSupabaseProviderMetadata(metadata)) {
+    // Fail safe UI (should not happen if data pipeline is correct)
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle className="flex gap-2 items-center mb-4">
+              <SupabaseIcon />
+              Supabase deployment info unavailable
+            </DialogTitle>
+            <DialogDescription>
+              We couldn&apos;t parse deployment metadata. Try redeploying.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  const { project } = metadata
 
   const projectUrl = `${process.env.NEXT_PUBLIC_SUPABASE_PLATFORM_URL}/dashboard/project/${project.id}`
   const databaseUrl = getDatabaseUrl({ project })

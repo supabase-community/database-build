@@ -23,9 +23,9 @@ export const useDatabaseCreateMutation = ({
       }
       return await dbManager.createDatabase(id, { isHidden })
     },
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutation) {
       await Promise.all([queryClient.invalidateQueries({ queryKey: getDatabasesQueryKey() })])
-      return onSuccess?.(data, variables, context)
+      return onSuccess?.(data, variables, context as any, mutation as any)
     },
     ...options,
   })
