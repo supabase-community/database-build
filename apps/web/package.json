@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "npm run build:sw && next dev",
-    "build": "npm run build:sw && next build",
+  "dev": "pnpm run build:sw && next dev",
+  "build": "pnpm run build:sw && next build",
     "build:sw": "vite build",
     "start": "next start",
     "lint": "next lint",
@@ -14,7 +14,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.0.4",
     "@dagrejs/dagre": "^1.1.2",
-    "@database.build/deploy": "*",
+  "@database.build/deploy": "workspace:*",
     "@electric-sql/pglite": "^0.2.14",
     "@electric-sql/pglite-tools": "^0.2.2",
     "@gregnr/postgres-meta": "^0.82.0-dev.2",

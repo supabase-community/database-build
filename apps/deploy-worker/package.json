@@ -3,14 +3,14 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file=.env --experimental-strip-types src/index.ts",
-    "dev": "npm run start",
+  "dev": "pnpm run start",
     "build": "echo 'built'",
     "type-check": "tsc",
-    "generate:database-types": "npx supabase gen types --lang=typescript --local > ./supabase/database-types.ts",
-    "generate:management-api-types": "npx openapi-typescript https://api.supabase.com/api/v1-json -o ./supabase/management-api/types.ts"
+  "generate:database-types": "pnpm dlx supabase gen types --lang=typescript --local > ./supabase/database-types.ts",
+  "generate:management-api-types": "pnpm dlx openapi-typescript https://api.supabase.com/api/v1-json -o ./supabase/management-api/types.ts"
   },
   "dependencies": {
-    "@database.build/deploy": "*",
+  "@database.build/deploy": "workspace:*",
     "@hono/node-server": "^1.13.2",
     "@hono/zod-validator": "^0.4.1",
     "@supabase/supabase-js": "^2.45.4",
