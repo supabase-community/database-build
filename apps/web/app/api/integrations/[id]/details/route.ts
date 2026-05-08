@@ -55,30 +55,30 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       throw new Error('Integration not found', { cause: getIntegrationError })
     }
 
-    if (integration.revoked_at) {
+    if (integration && 'revoked_at' in integration && (integration as any).revoked_at) {
       throw new IntegrationRevokedError()
     }
 
-    const credentialsSecretId = integration.credentials
+    const credentialsSecretId = (integration as any).credentials
 
     if (!credentialsSecretId) {
       throw new Error('Integration has no credentials')
     }
 
-    if (!integration.scope) {
+    if (!(integration as any).scope) {
       throw new Error('Integration has no scope')
     }
 
     if (
-      typeof integration.scope !== 'object' ||
-      !('organizationId' in integration.scope) ||
-      typeof integration.scope.organizationId !== 'string'
+      typeof (integration as any).scope !== 'object' ||
+      !('organizationId' in (integration as any).scope) ||
+      typeof (integration as any).scope.organizationId !== 'string'
     ) {
       throw new Error('Integration scope is invalid')
     }
 
     const accessToken = await getAccessToken(ctx, {
-      integrationId: integration.id,
+      integrationId: (integration as any).id,
       credentialsSecretId,
     })
 
@@ -89,7 +89,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       {
         params: {
           path: {
-            slug: integration.scope.organizationId,
+            slug: (integration as any).scope.organizationId,
           },
         },
       }
@@ -100,14 +100,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const integrationDetails: IntegrationDetails = {
-      id: integration.id,
+      id: (integration as any).id,
       provider: {
-        id: integration.provider.id,
-        name: integration.provider.name,
+        id: (integration as any).provider.id,
+        name: (integration as any).provider.name,
       },
       organization: {
-        id: organization.id,
-        name: organization.name,
+        id: (organization as any).id,
+        name: (organization as any).name,
       },
     }
 
@@ -116,7 +116,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     console.error(error)
 
     if (error instanceof IntegrationRevokedError) {
-      await revokeIntegration(ctx, { integrationId })
+      await revokeIntegration(ctx as any, { integrationId })
       return Response.json({ message: error.message }, { status: 406 })
     }
 

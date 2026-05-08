@@ -1,7 +1,7 @@
 'use client'
 
 import { Editor } from '@monaco-editor/react'
-import { ParseResult } from 'libpg-query/wasm'
+import { ParseResult } from '~/lib/libpg-query-compat'
 import { FileCode, Info, MessageSquareMore, Workflow } from 'lucide-react'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
@@ -66,7 +66,7 @@ export default function IDE({ children, className }: IDEProps) {
         .filter((sql) => sql !== undefined) ?? []
 
     // Dynamically import (browser-only) to prevent SSR errors
-    const { deparse, parseQuery } = await import('libpg-query/wasm')
+    const { deparse, parseQuery } = await import('~/lib/libpg-query-compat')
 
     const migrations: string[] = []
 

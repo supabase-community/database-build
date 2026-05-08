@@ -18,7 +18,7 @@ export default function ExecutedSql({ toolInvocation }: ExecutedSqlProps) {
 
   const { value: containsMigration } = useAsyncMemo(async () => {
     // Dynamically import (browser-only) to prevent SSR errors
-    const { parseQuery } = await import('libpg-query/wasm')
+    const { parseQuery } = await import('~/lib/libpg-query-compat')
 
     const parseResult = await parseQuery(sql)
     assertDefined(parseResult.stmts, 'Expected stmts to exist in parse result')

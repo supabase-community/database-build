@@ -46,7 +46,7 @@ export function DeployInfoDialog({
   onOpenChange,
   onRedeploy,
 }: DeployInfoDialogProps) {
-  const { project } = deployedDatabase.provider_metadata as { project: SupabaseProject }
+  const { project } = (deployedDatabase as any).provider_metadata as { project: SupabaseProject }
 
   const projectUrl = `${process.env.NEXT_PUBLIC_SUPABASE_PLATFORM_URL}/dashboard/project/${project.id}`
   const databaseUrl = getDatabaseUrl({ project })
@@ -57,8 +57,8 @@ export function DeployInfoDialog({
     url: projectUrl,
     databaseUrl,
     poolerUrl,
-    createdAt: deployedDatabase.last_deployment_at
-      ? new Date(deployedDatabase.last_deployment_at)
+    createdAt: (deployedDatabase as any).last_deployment_at
+      ? new Date((deployedDatabase as any).last_deployment_at)
       : undefined,
   }
 
