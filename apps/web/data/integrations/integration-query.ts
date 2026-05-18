@@ -1,6 +1,7 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { IntegrationDetails } from '~/app/api/integrations/[id]/details/route'
 import { createClient } from '~/utils/supabase/client'
+import { useApp } from '~/components/app-provider'
 
 async function getIntegrationDetails(id: number): Promise<IntegrationDetails> {
   const response = await fetch(`/api/integrations/${id}/details`)
@@ -33,8 +34,11 @@ export const useIntegrationQuery = (
   name: string,
   options: Omit<UseQueryOptions<IntegrationDetails, Error>, 'queryKey' | 'queryFn'> = {}
 ) => {
+  const { user } = useApp()
+
   return useQuery<IntegrationDetails, Error>({
     ...options,
+    enabled: options.enabled !== undefined ? options.enabled : !!user,
     queryKey: getIntegrationQueryKey(name),
     queryFn: async () => {
       const { id } = await getIntegration(name)
