@@ -1,4 +1,4 @@
-import { A_Const, A_Expr, ColumnRef, Node, RawStmt } from 'libpg-query/wasm'
+import { A_Const, A_Expr, ColumnRef, Node, RawStmt } from './libpg-query-compat'
 import { format } from 'sql-formatter'
 
 export function isQueryStatement(stmt: RawStmt) {

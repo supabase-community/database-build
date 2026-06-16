@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
   const getRevokedIntegrationsResponse = await supabase
     .from('deployment_provider_integrations')
     .select('id,scope')
-    .eq('deployment_provider_id', getDeploymentProviderResponse.data.id)
+    .eq('deployment_provider_id', (getDeploymentProviderResponse.data as any).id)
     .not('revoked_at', 'is', null)
 
   if (getRevokedIntegrationsResponse.error) {
@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
   }
 
   const revokedIntegration = getRevokedIntegrationsResponse.data.find(
-    (ri) => (ri.scope as { organizationId: string }).organizationId === organization.id
+    (ri) => ((ri as any).scope as { organizationId: string }).organizationId === (organization as any).id
   )
 
   const adminClient = createAdminClient()
@@ -145,25 +145,25 @@ export async function GET(req: NextRequest) {
 
   // if an existing revoked integration exists, update the tokens and cancel the revocation
   if (revokedIntegration) {
-    const updateIntegrationResponse = await supabase
+    const updateIntegrationResponse = await (supabase as any)
       .from('deployment_provider_integrations')
       .update({
-        credentials: credentialsSecret.data,
+        credentials: (credentialsSecret as any).data,
         revoked_at: null,
       })
-      .eq('id', revokedIntegration.id)
+      .eq('id', (revokedIntegration as any).id)
 
     if (updateIntegrationResponse.error) {
       return new Response('Failed to update integration', { status: 500 })
     }
   } else {
-    const createIntegrationResponse = await supabase
+    const createIntegrationResponse = await (supabase as any)
       .from('deployment_provider_integrations')
       .insert({
-        deployment_provider_id: getDeploymentProviderResponse.data.id,
-        credentials: credentialsSecret.data,
+        deployment_provider_id: (getDeploymentProviderResponse.data as any).id,
+        credentials: (credentialsSecret as any).data,
         scope: {
-          organizationId: organization.id,
+          organizationId: (organization as any).id,
         },
       })
       .select('id')
