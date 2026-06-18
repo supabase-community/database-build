@@ -1,13 +1,16 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { createClient } from '~/utils/supabase/client'
+import { useApp } from '~/components/app-provider'
 
 export const useIsOnDeployWaitlistQuery = (
   options: Omit<UseQueryOptions<boolean, Error>, 'queryKey' | 'queryFn'> = {}
 ) => {
   const supabase = createClient()
+  const { user } = useApp()
 
   return useQuery<boolean, Error>({
     ...options,
+    enabled: options.enabled !== undefined ? options.enabled : !!user,
     queryKey: getIsOnDeployWaitlistQueryKey(),
     queryFn: async () => {
       const { data, error } = await supabase.auth.getUser()
