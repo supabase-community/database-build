@@ -30,6 +30,12 @@ const app = new Hono()
 
 app.use('*', cors())
 
+// Global instance for suppabase admin (does not depend on the user)
+const supabaseAdmin = createClient<Database>(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
 app.post(
   '/',
   zValidator(
@@ -49,11 +55,7 @@ app.post(
       throw new HTTPException(401, { message: 'Unauthorized' })
     }
 
-    const supabaseAdmin = createClient<Database>(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-
+    // Only the user's customer is created by Request
     const supabase = createClient<Database>(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_ANON_KEY!
@@ -81,11 +83,11 @@ app.post(
     } catch (error: unknown) {
       console.error(error)
       if (error instanceof DeployError) {
-        throw new HTTPException(500, { message: error.message })
+        throw new HTTPException(500, { message: (error as Error).message })
       }
       if (error instanceof IntegrationRevokedError) {
-        await revokeIntegration(ctx, { integrationId })
-        throw new HTTPException(406, { message: error.message })
+// It is not necessary to wait for the revocation to respond to respond        void revokeIntegration(ctx, { integrationId })
+        throw new HTTPException(406, { message: (error as Error).message })
       }
       throw new HTTPException(500, { message: 'Internal server error' })
     }
